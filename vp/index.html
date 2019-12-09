@@ -165,7 +165,7 @@ data.title="Dakshinpanthi";
 data.body=7272;
 data.footer=7272;
 }
-$("body").append('<div class="modal active" id="modal-id"> <a href="#close" class="modal-overlay" aria-label="Close"></a> <div class="modal-container"> <div class="modal-header"> <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a> <div class="modal-title h5">आप <b>'+data.title+'</b> है</div> </div> <div class="modal-body"> <div class="content"> '+data.body+' </div> </div> <div class="modal-footer"> '+data.footer+' </div> </div> </div>');
+$("body").append('<div class="modal active" id="modal-id"> <a href="#close" class="modal-overlay" aria-label="Close"></a> <div class="modal-container"> <div class="modal-header"> <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a> <div class="modal-title h5">आप <span class="label label-warning">'+data.title+'</span> है</div> </div> <div class="modal-body"> <div class="content"> '+data.body+' </div> </div> <div class="modal-footer"> '+data.footer+' </div> </div> </div>');
  
  $(".btn-clear").click(function(){
  $(".modal").remove();

@@ -1,10 +1,183 @@
-<link href="https://fonts.googleapis.com/css?family=Vesper+Libre&display=swap" rel="stylesheet"/>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Spectre.css CSS Framework</title>
+    <meta charset="utf-8">
+    <meta name="robots" content="index, follow">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="description" content="Spectre.css CSS Framework is a lightweight, responsive and modern CSS framework for faster and extensible development. Spectre provides basic styles for typography and elements, flexbox based responsive layout system, pure CSS components and utilities with best practice coding and consistent design language.">
+    <meta name="author" content="Yan Zhu">
+    <meta property="og:url" content="https://picturepan2.github.io/spectre/">
+    <meta property="og:title" content="Spectre.css CSS Framework">
+    <meta property="og:description" content="Spectre.css CSS Framework is a lightweight, responsive and modern CSS framework for faster and extensible development. Spectre provides basic styles for typography and elements, flexbox based responsive layout system, pure CSS components and utilities with best practice coding and consistent design language.">
+    <meta name="twitter:card" content="summary">
+    <meta name="twitter:site" content="@spectrecss">
+    <meta name="twitter:creator" content="@picturepan2">
+    <link rel="shortcut icon" href="img/favicons/favicon.ico">
+    <link rel="icon" href="img/favicons/favicon.png">
+    <link rel="stylesheet" href="css/spectre.min.css">
+    <link rel="stylesheet" href="css/spectre-icons.min.css">
+    <link rel="stylesheet" href="css/spectre-exp.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Vesper+Libre&display=swap" rel="stylesheet"/>
 <style>
 body{
 font-family: 'Vesper Libre', serif;
+    font-size:18px;
 }
   p{
-  font-size:18px;
+
   }
 </style>
-नासा ने जब परिष्कन किया था, तब उन्होंने इसका प्रयोग कुल 190 छात्रों पर किया था
+  </head>
+  <body style="padding:5%;" class="contaibner">
+
+
+<div class="navbar">
+<div class="navbar-section"><a class="navbar-brand text-bold mr-4" style="padding-left:13px"hdref="https://picturepan2.github.io/spectre/layout/navbar.html#navbar">Left-Watch</a>
+
+</div>
+<div class="navbar-section">
+<div class="input-group input-inline"><input class="form-input" type="text" placeholder="search" /><button class="btn btn-primary input-group-btn">Search</button></div>
+</div>
+</div>
+
+<div class="panel" style="margin-top:12px">
+  <div class="panel-header">
+    <div class="panel-title text-bold">
+    निचे दिए गये प्रश्नों के उत्तर दे कर आप अपने आप को पहचान सकते है की आप वामपंथी है या दक्षिणपंथी ।
+</div>
+  </div>
+  <div class="panel-nav">
+    <!-- navigation components: tabs, breadcrumbs or pagination -->
+  </div>
+  <div class="panel-body">
+<div class="divider"></div>
+<!-- Question Starts-->
+  <div class="form-group">
+  <label class="form-label">
+  दुनियाभर मे मुसलमानो के 57 देश है, फिर भी रोहिंग्या भारत मे घुस हे है ।
+  क्या रोहिंग्या मुसलमानो को भारत से निकाल देना चाहिए ?
+  </label>
+  <label class="form-radio">
+  <input type="radio" name="q1"value="1">
+  <i class="form-icon"></i> 
+Yes  </label>
+  <label class="form-radio">
+  <input type="radio" name="q1" value="0">
+  <i class="form-icon"></i> No
+  </label>
+  </div>
+ <!-- question end-->
+ <div class="divider"></div>
+ 
+    <!-- Question Starts-->
+    <div class="form-group">
+    <label class="form-label">
+पुरी दुनिया मे हिंदुओ का एक भी देश नही, क्या आपको लगता है की भारत को हिंदूराष्ट्र घोषित कर देना चाहिए ?
+</label>
+    <label class="form-radio">
+    <input type="radio" name="q2"value="1">
+    <i class="form-icon"></i> 
+Yes    </label>
+    <label class="form-radio">
+    <input type="radio" name="q2" value="0">
+    <i class="form-icon"></i> No
+    </label>
+    </div>
+    <!-- question end-->
+    <div class="divider"></div>
+    
+    <!-- Question Starts-->
+    <div class="form-group">
+    <label class="form-label">
+    	क्या संविधान से सेकुलर शब्द को निकाल देना चाहिए ?
+    </label>
+    <label class="form-radio">
+    <input type="radio" name="q3"value="1">
+    <i class="form-icon"></i> 
+Yes    </label>
+    <label class="form-radio">
+    <input type="radio" name="q3" value="0">
+    <i class="form-icon"></i> No
+    </label>
+    </div>
+    <!-- question end-->
+    <div class="divider"></div>
+    
+    <!-- Question Starts-->
+    <div class="form-group">
+    <label class="form-label">
+    	"हिंदु धर्म सभी धर्मो से अच्छा है." क्या आप इस बात से सहमत है ?
+    </label>
+    <label class="form-radio">
+    <input type="radio" name="q4"value="1">
+    <i class="form-icon"></i> 
+Yes    </label>
+    <label class="form-radio">
+    <input type="radio" name="q4" value="0">
+    <i class="form-icon"></i> No
+    </label>
+    </div>
+    <!-- question end-->
+    <div class="divider"></div>
+    
+    <!-- contents -->
+  </div>
+  <div class="panel-footer">
+  
+  <button class="btn btn-block">Check</button>
+<progress class="progress" max="100"></progress>
+    <!-- buttons or inputs -->
+  </div>
+</div>
+
+
+<div class="modal" id="modal-id">
+  <a href="#close" class="modal-overlay" aria-label="Close"></a>
+  <div class="modal-container">
+    <div class="modal-header">
+      <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
+      <div class="modal-title h5">Modal title</div>
+    </div>
+    <div class="modal-body">
+      <div class="content">
+        <!-- content here -->
+      </div>
+    </div>
+    <div class="modal-footer">
+      ...
+    </div>
+  </div>
+</div>
+
+
+
+
+<script src="js/jquery.js"></script>
+
+<script>
+	function rv(n){
+return $("input[name='"+n+"']:checked").val()
+}
+function rn(n){
+return Number($("input[name='"+n+"']:checked").val())
+}
+$(".btn-clear").click(function(){
+	$("#modal-id").removeClass("active");
+	})
+	$("button").click(function(){
+if(rv("q1") && rv("q2") && rv("q3") && rv("q4")){
+var result = rn("q1")+rn("q2")+rn("q3")+rn("q4");
+alert(result);
+}else{
+	alert("Please answer all questions");
+	}
+
+		})
+	</script>
+	
+	
+
+  </body>
+</html>

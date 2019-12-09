@@ -133,27 +133,6 @@ Yes    </label>
 </div>
 
 
-<div class="modal" id="modal-id">
-  <a href="#close" class="modal-overlay" aria-label="Close"></a>
-  <div class="modal-container">
-    <div class="modal-header">
-      <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a>
-      <div class="modal-title h5">Modal title</div>
-    </div>
-    <div class="modal-body">
-      <div class="content">
-        <!-- content here -->
-      </div>
-    </div>
-    <div class="modal-footer">
-      ...
-    </div>
-  </div>
-</div>
-
-
-
-
 <script src="jquery.js"></script>
 
 <script>
@@ -163,19 +142,44 @@ return $("input[name='"+n+"']:checked").val()
 function rn(n){
 return Number($("input[name='"+n+"']:checked").val())
 }
-$(".btn-clear").click(function(){
-	$("#modal-id").removeClass("active");
-	})
+
 	$("button").click(function(){
+
 if(rv("q1") && rv("q2") && rv("q3") && rv("q4")){
+$("progress").show();
+setTimeout(function(){
+
+
+ 
+$("progress").hide(300);
 var result = rn("q1")+rn("q2")+rn("q3")+rn("q4");
-alert(result);
+
+if(result < 3){
+data=[];
+data.title="Vaampamthi";
+data.body=7272;
+data.footer=7272;
+}else{
+data=[];
+data.title="Dakshinpanthi";
+data.body=7272;
+data.footer=7272;
+}
+$("body").append('<div class="modal active" id="modal-id"> <a href="#close" class="modal-overlay" aria-label="Close"></a> <div class="modal-container"> <div class="modal-header"> <a href="#close" class="btn btn-clear float-right" aria-label="Close"></a> <div class="modal-title h5">आप <b>'+data.title+'</b> है</div> </div> <div class="modal-body"> <div class="content"> '+data.body+' </div> </div> <div class="modal-footer"> '+data.footer+' </div> </div> </div>');
+ 
+ $(".btn-clear").click(function(){
+ $(".modal").remove();
+ 
+ })
+ 
+//alert(result);
+},2000)
 }else{
 	alert("Please answer all questions");
 	}
 
 		})
-	</script>
+</script>
 	
 	
 

@@ -1,20 +1,21 @@
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
-dfssdf
+2343233
 <script>
 
-$.ajax({
-    url: "https://api.razorpay.com/v1/orders",
-    data: '{ "amount": 50000,    "currency": "INR",    "receipt": "rcptid_11",    "payment_capture": 1}',
-    
-    success: function (data) {
-      alert(JSON.stringify(data));
-    },
-    error: function(){
-      alert("Cannot get data");
-    }
-});
-
+$.post( "https://api.razorpay.com/v1/orders", function() {
+  alert( "success" );
+})
+  .done(function() {
+    alert( "second success" );
+  })
+  .fail(function() {
+    alert( "error" );
+  })
+  .always(function() {
+    alert( "finished" );
+  });
+ 
 </script>
 
 

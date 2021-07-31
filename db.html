@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/localstoragedb.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+<script src="js/datetime.js"></script>
+       <link rel="stylesheet" type="text/css" href="js/DataTables/datatables.min.css"/>
+   <link rel="stylesheet" href="css/bootstrap.min.css">
+<script type="text/javascript" src="js/DataTables/datatables.min.js"></script>
+    <title>Hello, world!</title>
+   
+
+    <div class="mb-3"></div>
+
+
+<div class="container">
+
+ <!-- As a link -->
+<nav class="navbar navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Database Tools</a>
+  </div>
+</nav>
+<nav class=" mt-3 navbar navbar-light bg-light">
+  <a class="ml-4" style="margin-left: 15px; font-weight: bold;" href="index.html">< Back</a>
+  <a href="#"  style="margin-right: 15px; font-weight: bold;"  class=" float-right">Database Manager</a>
+</nav>
+
+
+<div class="alert mt-3 alert-info">
+<a class="btn btn-md mb-3 btn-warning" download="database.json" href="" id="database">Back Up Database</a><br>
+<a class="btn btn-md btn-warning" download="entries.json" href="" id="entries">Back Up Entries</a><br>
+<a class="btn btn-md btn-danger mt-3" onclick="clearData();">Clear Database</a><br>
+
+
+<div class="input-group mt-3">
+  <input type="file" class="form-control" id="fileinput" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+  <button class="btn btn-outline-secondary" type="button" id="upload">Upload</button>
+</div>
+
+
+</div>
+
+<script type="text/javascript">
+  
+  var db = localStorageDB("baitule", localStorage);
+ 
+
+$("#upload").click(function(){
+  if($("#fileinput").val() != ""){
+var myFile = $('#fileinput').prop('files')[0];
+var reader = new FileReader();
+      var b = reader.readAsText(myFile);
+ reader.onload = function(e) {
+            // browser completed reading file - display it
+           var entries = e.target.result;
+          // document.write(entries);
+
+//var entries = JSON.parse('[{"name":"sdf","date":"2021/07/30","village":"sdf","money":"sdf","via":"guhe"},{"name":"fsd","date":"2021/07/30","village":"f","money":"dfssd","via":"guhe"}]');
+
+ if(db.createTableWithData("data", JSON.parse(entries))){
+            toastr.success("Entries Added Successfully");
+            //window.location.href="index.html";
+           }
+
+
+
+
+     };
+//console.log(b.target.result)
+}else{
+  toastr.error("No File Selected")
+}
+})
+
+
+
+var text = JSON.stringify(localStorage);
+var data = new Blob([text], {type: 'text/plain'});
+
+var url = window.URL.createObjectURL(data);
+
+document.getElementById('database').href = url;
+
+
+/*
+var json = val;
+var fields = Object.keys(json[0])
+var replacer = function(key, value) { return value === null ? '' : value } 
+var csv = json.map(function(row){
+  return fields.map(function(fieldName){
+    return JSON.stringify(row[fieldName], replacer)
+  }).join(',')
+})
+csv.unshift(fields.join(',')) // add header column
+ csv = csv.join('\r\n');
+console.log(csv)
+*/
+
+if(db.tableExists("data")){
+
+
+  var val= db.queryAll("data");
+
+
+
+arr_1 = val;
+
+// solution 1
+
+arr_1.forEach(elm=>delete elm.ID)
+
+// solution 2 for(let elm of arr_2){ Reflect.deleteProperty(elm, 'Name') } // changing
+
+
+var ttext = JSON.stringify(arr_1);
+
+
+var tdata = new Blob([ttext], {type: 'text/plain'});
+var turl = window.URL.createObjectURL(tdata);
+
+
+document.getElementById('entries').href = turl;
+
+}
+function clearData(){
+  var clear = confirm("Do you want to clear database??")
+  if(clear == true){
+  localStorage.clear()
+  toastr.success("Database Cleared Successfully")
+  }else{
+    toastr.warning("Operation Canceled")
+  }   
+}
+
+
+</script>
+
+</div>

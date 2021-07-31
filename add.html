@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    
+<div class="container">
+
+<!-- As a link -->
+<nav class="navbar navbar-dark bg-secondary">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="index.html">Add New Entry</a>
+  </div>
+</nav>
+
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/localstoragedb.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+    <title>Hello world!</title>
+
+<nav class=" mt-3 navbar navbar-light bg-light">
+  <a class="ml-4" style="margin-left: 15px; font-weight: bold;" href="index.html">< Back</a>
+  <a href="#"  style="margin-right: 15px; font-weight: bold;"  class=" float-right">Add new Entry</a>
+</nav>
+
+
+<script src="js/datetime.js"></script>
+       <link rel="stylesheet" type="text/css" href="js/DataTables/datatables.min.css"/>
+ 
+<script type="text/javascript" src="js/DataTables/datatables.min.js"></script>
+
+    <input type="text" class="form-control name mt-3" placeholder="name">
+    <input type="text" class="form-control date mt-3" placeholder="date">
+    <input type="number" class="form-control money mt-3"placeholder="money">
+    <input type="text" class="form-control village mt-3"placeholder="village">
+    <select class="form-control via mt-3" id="exampleFormControlSelect1">
+      <option></option>
+      <option>guhe</option> 
+      <option>tanwar</option>
+    </select>
+    <button class="btn btn-block bg-dark mt-3 text-white">Add Entry</button>
+  </head>
+  <body>
+    <script type="text/javascript">
+$(document).ready(function(){
+  var db = localStorageDB("baitule", localStorage);
+//  db.insert("data", {name:"myself",date:"20-5-20",village:"fdhsfsdkh",money:16000})
+
+
+$(".date").val(moment().format("YYYY/MM/DD"))
+
+ new DateTime($(".date"), {
+        format: 'YYYY/MM/DD'
+    });
+
+
+$("button").click(function(){
+if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").val()){
+
+    db.insert("data", {name:$(".name").val(),date:$(".date").val(),village:$(".village").val(),money:$(".money").val(),via:$(".via").val()})
+
+    if(db.commit()){
+      
+        toastr.success("Entry added successfully!");
+
+        window.location.href="index.html";
+    }
+  }else{
+    toastr.warning("Please fill all the values!");
+  }
+})
+
+   })
+    //localStorage.clear();
+  
+
+    </script>
+
+
+  </body>
+</html>

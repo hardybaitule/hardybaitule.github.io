@@ -14,6 +14,9 @@ self.addEventListener('install', function(e) {
       return cache.addAll([
         '/',
         '/index.html',
+        '/db.html',
+        '/edit.html',
+        '/add.html',
         '/js/jquery.min.js',
         '/js/bootstrap.min.js',
         '/js/localstoragedb.min.js',

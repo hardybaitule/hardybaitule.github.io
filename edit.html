@@ -72,10 +72,24 @@
         return "No Parameters Found";
     }
 }
+
+
+
+
+
 $(document).ready(function(){
+
+  var url = document.URL;
+
+    var url_splitted = url.split('#');
+
+    var idD = (url_splitted[1]).split('=')[1];
+
+
+
   var db = localStorageDB("baitule", localStorage);
 
-  var current=db.queryAll("data",{query:{ID: urlget("id")}})
+  var current=db.queryAll("data",{query:{ID: idD}})
   $(".name").val(current[0]["name"]);
   $(".date").val(current[0]["date"]);
   $(".village").val(current[0]["village"]);

@@ -40,41 +40,6 @@
   </head>
   <body>
     <script type="text/javascript">
-      function urlget(paramName)
-{
-    var sURL = window.document.URL.toString();
-    if (sURL.indexOf("?") > 0)
-    {
-        var arrParams = sURL.split("?");
-        var arrURLParams = arrParams[1].split("&");
-        var arrParamNames = new Array(arrURLParams.length);
-        var arrParamValues = new Array(arrURLParams.length);
-
-        var i = 0;
-        for (i = 0; i<arrURLParams.length; i++)
-        {
-            var sParam =  arrURLParams[i].split("=");
-            arrParamNames[i] = sParam[0];
-            if (sParam[1] != "")
-                arrParamValues[i] = unescape(sParam[1]);
-            else
-                arrParamValues[i] = "No Value";
-        }
-
-        for (i=0; i<arrURLParams.length; i++)
-        {
-            if (arrParamNames[i] == paramName)
-            {
-                //alert("Parameter:" + arrParamValues[i]);
-                return arrParamValues[i];
-            }
-        }
-        return "No Parameters Found";
-    }
-}
-
-
-
 
 
 $(document).ready(function(){
@@ -104,7 +69,7 @@ if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").va
 */
 
 // change the title of books published in 1999 to "Unknown"
-db.update("data", {ID: urlget("id")}, function(row) {
+db.update("data", {ID: idD}, function(row) {
   row.name = $(".name").val();
   row.date = $(".date").val();
   row.village = $(".village").val();

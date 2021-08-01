@@ -89,16 +89,15 @@
 
 
   })
-  $(".table").DataTable({"order": [[ 1 , "desc"]]});
-  $.each(val, function(index,value){
-       
- 
 
 
-  })
 
 
-  
+  var table = $(".table").DataTable({
+    "order": [[ 1 , "desc"]],
+    "lengthMenu": [[50, 100, -1], [50,100, "All"]]
+});
+
 
     </script>
 

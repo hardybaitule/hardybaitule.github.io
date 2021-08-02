@@ -63,27 +63,6 @@
   var db = localStorageDB("baitule", localStorage);
  
 
-function showsum(datai){
-
-   var mine = db.queryAll("data",{
-  query: {via: datai}
-})
-
-var str='';
-for (let i = 0; i < mine.length; i++) {
-  var str = +str + +mine[i].money
-}
-
-return(str)
-  
-}
-
- //alert(showsum("guhe"))
-$(".m").text("Mine: "+showsum(""));
-$(".g").text("G: "+showsum("guhe"));
-$(".t").text("T: "+ showsum("tanwar"));
-
-
 $("#upload").click(function(){
   if($("#fileinput").val() != ""){
 var myFile = $('#fileinput').prop('files')[0];
@@ -136,6 +115,27 @@ console.log(csv)
 */
 
 if(db.tableExists("data")){
+
+function showsum(datai){
+
+   var mine = db.queryAll("data",{
+  query: {via: datai}
+})
+
+var str='';
+for (let i = 0; i < mine.length; i++) {
+  var str = +str + +mine[i].money
+}
+
+return(str)
+  
+}
+
+ //alert(showsum("guhe"))
+$(".m").text("Mine: "+showsum(""));
+$(".g").text("G: "+showsum("guhe"));
+$(".t").text("T: "+ showsum("tanwar"));
+
 
 
   var val= db.queryAll("data");

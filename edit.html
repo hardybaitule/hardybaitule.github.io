@@ -31,11 +31,37 @@
     <input type="text" class="form-control date mt-3"placeholder="date">
     <input type="text" class="form-control money mt-3"placeholder="money">
     <input type="text" class="form-control village mt-3"placeholder="village">
+
+<div class="mt-3">
+<div class="form-check">
+  <input class="form-check-input blank via" type="radio" name="via" value="" >
+  <label class="form-check-label" for="flexRadioDefault1">
+    
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input via" type="radio" name="via" value="guhe">
+  <label class="form-check-label" for="flexRadioDefault1">
+    Guhe
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input via" type="radio" name="via" value="tanwar">
+  <label class="form-check-label" for="flexRadioDefault1">
+    Tanwar
+  </label>
+</div>
+</div>
+
+
+<!--
      <select class="form-control via mt-3" id="exampleFormControlSelect1">
       <option></option>
       <option>guhe</option> 
       <option>tanwar</option>
-    </select>
+    </select>-->
+
+
     <button class="btn btn-block bg-dark mt-3 text-white">Edit Entry</button>
   </head>
   <body>
@@ -59,11 +85,18 @@ $(document).ready(function(){
   $(".date").val(current[0]["date"]);
   $(".village").val(current[0]["village"]);
   $(".money").val(current[0]["money"]);
-  $(".via").val(current[0]["via"]);
+ console.log('['+current[0]["via"]+']')
+
+ if(current[0]["via"] == ""){
+   $(".blank").attr('checked', 'checked');
+ }else{
+  $("input[name=via][value=" + current[0]["via"] + "]").attr('checked', 'checked');
+ }
+ 
 
 
 $("button").click(function(){
-if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").val()){
+if($(".name").val() && $(".date").val() && $(".money").val()){
 /*
     db.insert("data", {name:$(".name").val(),date:$(".date").val(),village:$(".village").val(),money:$(".money").val()})
 */
@@ -74,7 +107,7 @@ db.update("data", {ID: idD}, function(row) {
   row.date = $(".date").val();
   row.village = $(".village").val();
   row.money = $(".money").val();
-  row.via = $(".via").val();
+  row.via = $('input[name="via"]:checked').val();
   // the update callback function returns to the modified record
   return row;
 });

@@ -36,11 +36,33 @@
     <input type="text" class="form-control date mt-3" placeholder="date">
     <input type="number" class="form-control money mt-3"placeholder="money">
     <input type="text" class="form-control village mt-3"placeholder="village">
-    <select class="form-control via mt-3" id="exampleFormControlSelect1">
+
+<div class="mt-3">
+<div class="form-check">
+  <input class="form-check-input via" type="radio" name="via" value="" checked="">
+  <label class="form-check-label" for="flexRadioDefault1">
+    
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input via" type="radio" name="via" value="guhe">
+  <label class="form-check-label" for="flexRadioDefault1">
+    Guhe
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input via" type="radio" name="via" value="tanwar">
+  <label class="form-check-label" for="flexRadioDefault1">
+    Tanwar
+  </label>
+</div>
+</div>
+<!--    <select class="form-control via mt-3" id="exampleFormControlSelect1">
       <option></option>
       <option>guhe</option> 
       <option>tanwar</option>
-    </select>
+    </select>-->
+
     <button class="btn btn-block bg-dark mt-3 text-white">Add Entry</button>
   </head>
   <body>
@@ -57,10 +79,14 @@ $(".date").val(moment().format("YYYY/MM/DD"))
     });
 
 
+
+
+
+
 $("button").click(function(){
 if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").val()){
 
-    db.insert("data", {name:$(".name").val(),date:$(".date").val(),village:$(".village").val(),money:$(".money").val(),via:$(".via").val()})
+    db.insert("data", {name:$(".name").val(),date:$(".date").val(),village:$(".village").val(),money:$(".money").val(),via:$('input[name="via"]:checked').val()})
 
     if(db.commit()){
       

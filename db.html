@@ -73,8 +73,6 @@ var reader = new FileReader();
            var entries = e.target.result;
           // document.write(entries);
 
-//var entries = JSON.parse('[{"name":"sdf","date":"2021/07/30","village":"sdf","money":"sdf","via":"guhe"},{"name":"fsd","date":"2021/07/30","village":"f","money":"dfssd","via":"guhe"}]');
-
  if(db.createTableWithData("data", JSON.parse(entries))){
             toastr.success("Entries Added Successfully");
             //window.location.href="index.html";

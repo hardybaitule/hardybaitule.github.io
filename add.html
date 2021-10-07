@@ -33,7 +33,7 @@
 <script type="text/javascript" src="js/DataTables/datatables.min.js"></script>
 
     <input type="text" class="form-control name mt-3" placeholder="name">
-    <input type="text" class="form-control date mt-3" placeholder="date">
+    <input type="text" class="form-control date mt-3" >
     <input type="number" class="form-control money mt-3"placeholder="money">
     <input type="text" class="form-control village mt-3"placeholder="village">
 
@@ -72,12 +72,15 @@ $(document).ready(function(){
 //  db.insert("data", {name:"myself",date:"20-5-20",village:"fdhsfsdkh",money:16000})
 
 
-$(".date").val(moment().format("YYYY/MM/DD"))
+  $(".date").val(moment().format("YYYY/MM/DD"))
+    //$(".date").attr('value',moment().format("YYYY-MM-DD"));
+    //alert(moment().format("YYYY/MM/DD"))
+    //alert(moment().format("YYYY/MM/DD"));
+
 
  new DateTime($(".date"), {
         format: 'YYYY/MM/DD'
     });
-
 
 
 
@@ -100,7 +103,7 @@ if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").va
 })
 
    })
-    //localStorage.clear();
+
   
 
     </script>

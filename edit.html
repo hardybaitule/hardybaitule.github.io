@@ -63,10 +63,17 @@
 
 
     <button class="btn btn-block bg-dark mt-3 text-white">Edit Entry</button>
+
+<ul class="list-group mt-3 mb-3" style="height: 300px">
+  <li class="list-group-item active" aria-current="true">Estimated Calculation</li>
+  <li class="list-group-item">Days: <span class="days"></span> , ( <span class="months"></span> Mo's )</li>
+  <li class="list-group-item">Total: <span class="amt"></span> + <span class="interest"></span> = <b><span class="totalamt"></span></b> </li>
+</ul>
+
   </head>
   <body>
     <script type="text/javascript">
-
+      
 
 $(document).ready(function(){
 
@@ -94,6 +101,23 @@ $(document).ready(function(){
  
 
 
+var adate =  moment(current[0]["date"]).format("MM/DD/YYYY");
+var bdate = moment().format("MM/DD/YYYY");
+
+
+const date1 = new Date(adate);
+const date2 = new Date(bdate);
+const diffTime = Math.abs(date2 - date1);
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+console.log(diffDays + " days");
+
+
+ $(".days").text(diffDays)
+$(".months").text((diffDays/30).toFixed(2))
+$(".amt").text(current[0]["money"])
+
+$(".interest").text((((current[0]["money"]*0.36)/365)*diffDays).toFixed(0))
+$(".totalamt").text(Number(current[0]["money"]) + Number((((current[0]["money"]*0.36)/365)*diffDays).toFixed(0)))
 $("button").click(function(){
 if($(".name").val() && $(".date").val() && $(".money").val()){
 /*

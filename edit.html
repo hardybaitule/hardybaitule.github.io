@@ -108,7 +108,7 @@ var bdate = moment().format("MM/DD/YYYY");
 const date1 = new Date(adate);
 const date2 = new Date(bdate);
 const diffTime = Math.abs(date2 - date1);
-const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
 
 
  $(".days").text(diffDays)

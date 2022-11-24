@@ -24,6 +24,7 @@ self.addEventListener('install', function(e) {
         '/js/DataTables/datatables.min.js',
         '/js/DataTables/datatables.min.css',
         '/css/bootstrap.min.css',
+        '/icon.png',
         '/manifest.json'
       ]);
     })

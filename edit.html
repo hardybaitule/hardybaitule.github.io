@@ -113,7 +113,7 @@ var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
  $(".days").text(diffDays)
   if(diffDays < 31){
-    diffDays=30;
+    diffDays=31;
   }
 $(".months").text((diffDays/30).toFixed(2))
 $(".amt").text(current[0]["money"])

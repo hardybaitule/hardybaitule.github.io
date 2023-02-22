@@ -60,6 +60,11 @@
 
 <script type="text/javascript">
   
+  if(window.location.hostname == "hardybaitule.github.io"){
+    alert(3000)
+  }
+  
+  
   var db = localStorageDB("baitule", localStorage);
  
 
@@ -69,20 +74,16 @@ var myFile = $('#fileinput').prop('files')[0];
 var reader = new FileReader();
       var b = reader.readAsText(myFile);
  reader.onload = function(e) {
-            // browser completed reading file - display it
            var entries = e.target.result;
-          // document.write(entries);
 
  if(db.createTableWithData("data", JSON.parse(entries))){
             toastr.success("Entries Added Successfully");
-            //window.location.href="index.html";
            }
 
 
 
 
      };
-//console.log(b.target.result)
 }else{
   toastr.error("No File Selected")
 }
@@ -97,20 +98,6 @@ var url = window.URL.createObjectURL(data);
 
 document.getElementById('database').href = url;
 
-
-/*
-var json = val;
-var fields = Object.keys(json[0])
-var replacer = function(key, value) { return value === null ? '' : value } 
-var csv = json.map(function(row){
-  return fields.map(function(fieldName){
-    return JSON.stringify(row[fieldName], replacer)
-  }).join(',')
-})
-csv.unshift(fields.join(',')) // add header column
- csv = csv.join('\r\n');
-console.log(csv)
-*/
 
 if(db.tableExists("data")){
 

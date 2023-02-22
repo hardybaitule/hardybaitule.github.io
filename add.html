@@ -86,7 +86,7 @@ $(document).ready(function(){
 
 
 $("button").click(function(){
-if($(".name").val() && $(".date").val() && $(".money").val() && $(".village").val()){
+if($(".name").val() && $(".date").val() && $(".money").val() ){
 
     db.insert("data", {name:$(".name").val(),date:$(".date").val(),village:$(".village").val(),money:$(".money").val(),via:$('input[name="via"]:checked').val()})
 

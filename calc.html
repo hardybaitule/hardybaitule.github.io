@@ -48,8 +48,6 @@
   </head>
   <body>
     <script type="text/javascript">
-      
-      
 
       function round(number) {
 
@@ -61,6 +59,9 @@ return Math.ceil(number / 10) * 10;
 $(document).ready(function(){
 
 
+var db = localStorageDB("baitule", localStorage);
+
+JSON.stringify(db.queryAll("data"))
 
 var adate =  moment().format("YYYY/MM/DD");
 var bdate = moment().format("YYYY/MM/DD");

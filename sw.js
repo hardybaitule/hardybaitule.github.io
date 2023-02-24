@@ -16,6 +16,7 @@ self.addEventListener('install', function(e) {
         '/index.html',
         '/db.html',
         '/edit.html',
+        '/calc.html',
         '/add.html',
         '/js/jquery.min.js',
         '/js/bootstrap.min.js',

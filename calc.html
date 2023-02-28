@@ -82,7 +82,7 @@ $("button").click(function(){
 
   intrate = Number($('.percent').val());
   money = Number($('.money').val());
-
+dayint = intrate
 
     var year1 = moment(adate).format("YYYY");
 var year2 = moment(bdate).format("YYYY");
@@ -107,7 +107,7 @@ totalmonths = ((diffyear * 12) + diffmonth );
 $(".amt").text(money)
 
 $(".monthinterest").text(((( money * intrate ) / 100 ) * totalmonths).toFixed(0))
-$(".dateinterest").text((((money * (intrate/10))/365)*diffdate).toFixed(0))
+$(".dateinterest").text((((money * intrate)/100)/30) * diffdate).toFixed(0))
 
 totalamt = Number(money) + Number($(".monthinterest").text()) + Number($(".dateinterest").text() );
 // totalamt = round(totalamt);

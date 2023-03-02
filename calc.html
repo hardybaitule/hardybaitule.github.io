@@ -31,7 +31,9 @@
     <input type="text" class="form-control startdate date mt-3"placeholder="Start Date">
     <input type="text" class="form-control enddate date mt-3"placeholder="End Date">
     <input type="tel" class="form-control money mt-3"placeholder="money">
-    <input type="number" value="2" class="form-control percent mt-3"placeholder="percent">
+  <br>
+   <label><input type="radio" name="int" value="2" checked>2</label> 
+        <label><input type="radio" name="int" value="3">3</label><br>
 
 
 
@@ -80,7 +82,7 @@ $("button").click(function(){
 
 
 
-  intrate = Number($('.percent').val());
+  intrate = Number( $("input[name='int']:checked").val() );
   money = Number($('.money').val());
 
 

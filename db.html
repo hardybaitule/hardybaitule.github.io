@@ -63,10 +63,7 @@
       <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
         <div class="accordion-body">
           <p onclick="showdata();"  class="m">...</p><p class="t">...</p><p class="g">..</p>
-          <br>
-          <p>
-            <button class="btn btn-md bg-warning" onclick="clearcache();">Clear Cache</button>
-          </p>
+          
         </div>
       </div>
     </div>
@@ -97,12 +94,12 @@
   
   var db = localStorageDB("baitule", localStorage);
  
-  function clearcache(){
+ /* function clearcache(){
     caches.keys().then(function(names) {
     for (let name of names)
         caches.delete(name);
 });
-  }
+  }*/
 
 $("#upload").click(function(){
   if($("#fileinput").val() != ""){

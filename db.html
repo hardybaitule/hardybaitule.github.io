@@ -62,7 +62,7 @@
       </h2>
       <div id="collapseOne" class="accordion-collapse collapse " data-bs-parent="#accordionExample">
         <div class="accordion-body">
-          <p class="m">...</p><p class="t">...</p><p class="g">..</p>
+          <p onclick="showdata();"  class="m">...</p><p class="t">...</p><p class="g">..</p>
         </div>
       </div>
     </div>
@@ -87,8 +87,8 @@
   
   
   if(window.location.hostname != "hardybaitule.github.io"){
-    window.location.href="//facebook.com/pavansinghbaitule";
-    throw new Error("Something went badly wrong!");
+    //window.location.href="//facebook.com/pavansinghbaitule";
+    //throw new Error("Something went badly wrong!");
   }
   
   var db = localStorageDB("baitule", localStorage);
@@ -117,12 +117,6 @@ var reader = new FileReader();
 
 
 
-var text = JSON.stringify(localStorage);
-var data = new Blob([text], {type: 'text/plain'});
-
-var url = window.URL.createObjectURL(data);
-
-document.getElementById('database').href = url;
 
 
 if(db.tableExists("data")){
@@ -141,14 +135,18 @@ for (let i = 0; i < mine.length; i++) {
 return(str)
   
 }
+function showdata(){
 
- //alert(showsum("guhe"))
-$(".m").text("Mine: "+showsum(""));
+  $(".m").text("Mine: "+showsum(""));
 $(".g").text("G: "+showsum("guhe"));
 $(".t").text("T: "+ showsum("tanwar"));
+}
+ //alert(showsum("guhe"))
 
 
-
+$(document).ready(function(){
+  
+})
   var val= db.queryAll("data");
 
 

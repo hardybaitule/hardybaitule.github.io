@@ -6,7 +6,7 @@
     <link rel="manifest" href="/manifest.json">
     <script>
   if('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.jsa')
+    navigator.serviceWorker.register('/sw.js')
       .then(() => console.log("Service Worker Registered"))
       .catch(e => console.log(e));
   }
@@ -22,7 +22,6 @@
     <script src="js/localstoragedb.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 <script src="js/datetime.js"></script>
-<script src="js/dateuk.js"></script>
        <link rel="stylesheet" type="text/css" href="js/DataTables/datatables.min.css"/>
  
 <script type="text/javascript" src="js/DataTables/datatables.min.js"></script>

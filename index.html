@@ -102,6 +102,9 @@
 
   var table = $(".table").DataTable({
     "order": [[ 1 , "desc"]],
+    "columnDefs": [
+       { type: 'date-uk', targets: 0 }
+     ],
     "lengthMenu": [[ 100, -1], [100, "All"]]
 });
 

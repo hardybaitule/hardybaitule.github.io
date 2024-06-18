@@ -23,6 +23,7 @@ self.addEventListener('install', function(e) {
         '/js/localstoragedb.min.js',
         '/js/datetime.js',
         '/js/DataTables/datatables.min.js',
+        '/js/dateuk.js',
         '/js/DataTables/datatables.min.css',
         '/css/bootstrap.min.css',
         '/icon.png',

@@ -89,7 +89,7 @@
   
 
   $.each(val,function(index,value){
-    $("tbody").append('<tr><td><a style="color:black;text-decoration:none;" href="edit.html#id='+val[index]["ID"]+'">'+val[index]["name"]+'</a></td><td style="display:none;">'+val[index]["date"]+'</td><td>'+moment(val[index]["date"], "YYYY/MM/DD").format("YYYY/MM/DD")+'</td><td>'+val[index]["money"]+'</td><td>'+val[index]["via"]+'</td><td><button onclick=deleteEntry('+val[index]["ID"]+',"'+encodeURIComponent(val[index]["name"])+'") class="btn btn-sm btn-danger" >🚫</button></td></tr>')
+    $("tbody").append('<tr><td><a style="color:black;text-decoration:none;" href="edit.html#id='+val[index]["ID"]+'">'+val[index]["name"]+'</a></td><td style="display:none;">'+val[index]["date"]+'</td><td>'+moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")+'</td><td>'+val[index]["money"]+'</td><td>'+val[index]["via"]+'</td><td><button onclick=deleteEntry('+val[index]["ID"]+',"'+encodeURIComponent(val[index]["name"])+'") class="btn btn-sm btn-danger" >🚫</button></td></tr>')
 
 
 

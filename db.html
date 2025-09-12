@@ -72,12 +72,6 @@
     
 
   
-</li>
-  <li class="list-group-item">
-     <span style="float: right;"><a class="btn btn-md btn-info"  onclick="updateApp()"  >Update App</a></span>
-    
-  </li>
-  
 </ul>
 
 
@@ -88,28 +82,6 @@
 
 <script type="text/javascript">
 
-
-async function updateApp() {
-  if ("serviceWorker" in navigator) {
-    const reg = await navigator.serviceWorker.getRegistration();
-    if (reg) {
-      // check for update
-      await reg.update();
-
-      // wait for new worker if available
-      if (reg.waiting) {
-        reg.waiting.postMessage({ type: "SKIP_WAITING" });
-        reg.waiting.addEventListener("statechange", e => {
-          if (e.target.state === "activated") {
-            window.location.reload(); // reload to get fresh files
-          }
-        });
-      } else {
-        alert("No update found, already latest version!");
-      }
-    }
-  }
-}
   
   
   

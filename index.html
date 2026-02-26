@@ -52,7 +52,7 @@
       <th style="display: none;" scope="col">Date</th>
       <th scope="col">Date</th>
       <th scope="col">Money</th>
-      <th scope="col">Via</th>
+      <th scope="col">Copy</th>
       <th scope="col">Delete</th>
     </tr>
   </thead>
@@ -89,13 +89,41 @@
   
 
   $.each(val,function(index,value){
-    $("tbody").append('<tr><td><a style="color:black;text-decoration:none;" href="edit.html#id='+val[index]["ID"]+'">'+val[index]["name"]+'</a></td><td style="display:none;">'+val[index]["date"]+'</td><td>'+moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")+'</td><td>'+val[index]["money"]+'</td><td>'+val[index]["via"]+'</td><td><button onclick=deleteEntry('+val[index]["ID"]+',"'+encodeURIComponent(val[index]["name"])+'") class="btn btn-sm btn-danger" >🚫</button></td></tr>')
 
 
+    $("tbody").append(`
+  <tr>
+    <td>
+      <a style="color:black;text-decoration:none;" href="edit.html#id=${val[index]["ID"]}">
+        ${val[index]["name"]}
+      </a>
+    </td>
+    <td style="display:none;">${val[index]["date"]}</td>
+    <td>${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")}</td>
+    <td>${val[index]["money"]}</td>
+    <td>
+      <a style="cursor:pointer" onclick="copytext('${val[index]["name"]} ${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")} ${val[index]["money"]}')">📋</a>
+    </td>
+    <td>
+      <button onclick="deleteEntry(${val[index]["ID"]}, '${encodeURIComponent(val[index]["name"])}')" class="btn btn-sm btn-danger">🚫</button>
+    </td>
+  </tr>
+`);
 
 
   })
 
+
+
+
+function copytext(value) {
+  // navigator.clipboard is the modern standard
+    navigator.clipboard.writeText(value).then(() => {
+        toastr.success("Entry copied successfully!");
+    }).catch(err => {
+        toastr.warning("not copied");
+    });
+}
 
 
 

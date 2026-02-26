@@ -102,7 +102,7 @@
     <td>${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")}</td>
     <td>${val[index]["money"]}</td>
     <td>
-      <a style="cursor:pointer" onclick="copytext('${val[index]["name"]} ${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")} ${val[index]["money"]}')">📋</a>
+      <a style="cursor:pointer" onclick="copytext('${val[index]["name"]} ${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")}')">📋</a>
     </td>
     <td>
       <button onclick="deleteEntry(${val[index]["ID"]}, '${encodeURIComponent(val[index]["name"])}')" class="btn btn-sm btn-danger">🚫</button>

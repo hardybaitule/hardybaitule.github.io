@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus P2P - Serverless WebRTC Messenger</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            900: '#312e81'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- PeerJS Library for automated WebRTC signaling -->
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <!-- QRCode.js for generating QR codes -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(156, 163, 175, 0.4);
+            border-radius: 9999px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(156, 163, 175, 0.6);
+        }
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+        }
+        .dark .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col font-sans overflow-x-hidden">
+
+    <!-- Navbar -->
+    <header class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                <i class="fa-solid fa-network-wired"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight flex items-center gap-2">
+                    Nexus P2P
+                    <span class="text-xs bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-semibold px-2 py-0.5 rounded-full border border-indigo-200 dark:border-indigo-800">Serverless</span>
+                </h1>
+                <p class="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1.5">
+                    <span id="global-status-dot" class="w-2 h-2 rounded-full bg-red-500 inline-block animate-pulse"></span>
+                    <span id="global-status-text">Disconnected</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+            <!-- Audio Call Toggle -->
+            <button id="audio-call-btn" disabled title="Start Audio Call" class="p-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-phone text-lg"></i>
+            </button>
+            <!-- Video Call Toggle -->
+            <button id="video-call-btn" disabled title="Start Video Call" class="p-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition disabled:opacity-40 disabled:cursor-not-allowed">
+                <i class="fa-solid fa-video text-lg"></i>
+            </button>
+            
+            <div class="h-6 w-px bg-gray-300 dark:bg-gray-700 mx-1"></div>
+
+            <!-- Connection Info / Pairing Modal Trigger -->
+            <button id="open-pair-modal-btn" class="px-3 py-1.5 text-xs sm:text-sm bg-brand-600 hover:bg-brand-700 text-white rounded-lg font-medium transition flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-link"></i>
+                <span class="hidden sm:inline">Connect Peer</span>
+            </button>
+
+            <!-- Theme Toggle -->
+            <button id="theme-toggle-btn" class="p-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition">
+                <i class="fa-solid fa-moon dark:hidden text-lg"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Application Container -->
+    <main class="flex-1 flex flex-col max-w-6xl w-full mx-auto p-2 sm:p-4 gap-4 relative overflow-hidden">
+
+        <!-- Active Call Overlay (Hidden by default) -->
+        <div id="call-container" class="hidden relative bg-gray-950 rounded-2xl overflow-hidden shadow-2xl border border-gray-800 flex flex-col justify-between min-h-[300px] sm:min-h-[400px]">
+            <!-- Remote Video -->
+            <video id="remote-video" autoplay playsinline class="w-full h-full object-cover absolute inset-0"></video>
+            
+            <!-- Video Floating Header -->
+            <div class="relative z-10 p-4 flex justify-between items-center bg-gradient-to-b from-black/80 to-transparent">
+                <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-green-500 animate-ping"></span>
+                    <span id="call-status-label" class="text-xs font-semibold text-white uppercase tracking-wider">Live Call</span>
+                </div>
+                <div class="text-white text-xs font-mono bg-black/40 px-2.5 py-1 rounded-md border border-white/10" id="call-timer">00:00</div>
+            </div>
+
+            <!-- Local Video Thumbnail -->
+            <div class="absolute bottom-16 right-4 z-10 w-28 h-40 sm:w-36 sm:h-48 rounded-xl overflow-hidden border-2 border-white/20 shadow-lg bg-gray-900">
+                <video id="local-video" autoplay playsinline muted class="w-full h-full object-cover"></video>
+            </div>
+
+            <!-- Call Control Bar -->
+            <div class="relative z-10 p-4 flex justify-center items-center gap-4 bg-gradient-to-t from-black/80 to-transparent">
+                <button id="toggle-mic-btn" class="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-microphone"></i>
+                </button>
+                <button id="toggle-cam-btn" class="w-12 h-12 rounded-full bg-gray-700 hover:bg-gray-600 text-white flex items-center justify-center transition">
+                    <i class="fa-solid fa-video"></i>
+                </button>
+                <button id="end-call-btn" class="w-12 h-12 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center transition shadow-lg">
+                    <i class="fa-solid fa-phone-slash"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Main Area -->
+        <div class="flex-1 flex flex-col bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            
+            <!-- Peer Header Banner -->
+            <div id="peer-banner" class="px-4 py-3 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div id="peer-avatar" class="w-10 h-10 rounded-full bg-indigo-500 text-white flex items-center justify-center font-bold text-sm">
+                            ?
+                        </div>
+                        <span id="peer-status-indicator" class="absolute bottom-0 right-0 w-3 h-3 bg-gray-400 border-2 border-white dark:border-gray-800 rounded-full"></span>
+                    </div>
+                    <div>
+                        <h2 id="peer-display-name" class="font-semibold text-sm sm:text-base">No Connected Peer</h2>
+                        <p id="peer-detail-info" class="text-xs text-gray-500 dark:text-gray-400 font-mono">Pair via auto room ID or manual SDP</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button id="clear-chat-btn" title="Clear Chat History" class="text-gray-400 hover:text-red-500 p-2 rounded-lg transition text-sm">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Messages Stream -->
+            <div id="messages-container" class="flex-1 p-4 overflow-y-auto space-y-4 custom-scrollbar min-h-[300px]">
+                
+                <!-- Welcome System Message -->
+                <div class="flex justify-center my-2">
+                    <div class="bg-indigo-50 dark:bg-gray-700/50 border border-indigo-100 dark:border-gray-600 text-indigo-900 dark:text-indigo-200 rounded-2xl p-4 max-w-md text-center text-xs leading-relaxed shadow-sm">
+                        <i class="fa-solid fa-shield-halved text-base text-brand-500 mb-1 block"></i>
+                        <span class="font-semibold">Direct End-to-End P2P Channel</span>
+                        <p class="mt-1 text-gray-600 dark:text-gray-300">
+                            Messages and files pass directly between devices using WebRTC Data Channels. No data is stored on external servers.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- File Upload Progress Bar (Hidden by default) -->
+            <div id="file-progress-container" class="hidden px-4 py-2 bg-indigo-50 dark:bg-gray-700/30 border-t border-gray-200 dark:border-gray-700 text-xs">
+                <div class="flex justify-between items-center mb-1 text-gray-600 dark:text-gray-300 font-medium">
+                    <span id="file-progress-label">Transferring file...</span>
+                    <span id="file-progress-percent">0%</span>
+                </div>
+                <div class="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-1.5 overflow-hidden">
+                    <div id="file-progress-bar" class="bg-brand-600 h-1.5 rounded-full transition-all duration-150" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Input Bar -->
+            <div class="p-3 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+                <form id="message-form" class="flex items-end gap-2">
+                    <!-- File Attachment Button -->
+                    <input type="file" id="file-input" class="hidden" />
+                    <button type="button" id="attachment-btn" title="Send File or Image" class="p-2.5 text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-xl transition flex-shrink-0">
+                        <i class="fa-solid fa-paperclip text-lg"></i>
+                    </button>
+
+                    <!-- Text Area / Input -->
+                    <div class="flex-1 relative">
+                        <textarea id="message-input" rows="1" placeholder="Type a secure message..." class="w-full py-2.5 px-4 bg-gray-100 dark:bg-gray-700/60 rounded-xl border-0 focus:ring-2 focus:ring-brand-500 text-sm resize-none custom-scrollbar outline-none transition text-gray-900 dark:text-gray-100 max-h-32"></textarea>
+                    </div>
+
+                    <!-- Send Button -->
+                    <button type="submit" id="send-btn" disabled class="p-2.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-40 text-white rounded-xl transition flex-shrink-0 shadow-md">
+                        <i class="fa-solid fa-paper-plane text-base px-0.5"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Connection Modal -->
+    <div id="pair-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 dark:border-gray-700 flex flex-col max-h-[90vh]">
+            
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-plug text-brand-500"></i>
+                    Peer Connection Setup
+                </h3>
+                <button id="close-modal-btn" class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex bg-gray-100 dark:bg-gray-700 rounded-xl p-1 mb-4 text-xs font-semibold">
+                <button id="tab-auto-btn" class="flex-1 py-2 rounded-lg text-center bg-white dark:bg-gray-800 shadow-sm text-brand-600 dark:text-brand-400 transition">
+                    Auto Broker (PeerJS)
+                </button>
+                <button id="tab-manual-btn" class="flex-1 py-2 rounded-lg text-center text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition">
+                    Manual SDP (Serverless)
+                </button>
+            </div>
+
+            <div class="overflow-y-auto custom-scrollbar flex-1 pr-1">
+                
+                <!-- AUTO PEERJS SECTION -->
+                <div id="section-auto" class="space-y-4">
+                    <div class="bg-gray-50 dark:bg-gray-700/40 p-3 rounded-xl border border-gray-200 dark:border-gray-600">
+                        <label class="block text-xs text-gray-500 dark:text-gray-400 mb-1">Your Peer ID</label>
+                        <div class="flex items-center gap-2">
+                            <input id="my-peer-id" readonly type="text" class="flex-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-1.5 text-xs font-mono select-all focus:outline-none" value="Generating..." />
+                            <button id="copy-my-id-btn" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-600 hover:bg-gray-300 dark:hover:bg-gray-500 rounded-lg text-xs font-medium transition">
+                                Copy
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Share Link & QR Code Container -->
+                    <div class="flex flex-col sm:flex-row items-center gap-4 bg-indigo-50/50 dark:bg-indigo-950/30 p-3 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                        <div id="qrcode" class="p-2 bg-white rounded-lg shadow-sm border border-gray-200 flex-shrink-0"></div>
+                        <div class="flex-1 text-center sm:text-left">
+                            <h4 class="text-xs font-bold text-indigo-950 dark:text-indigo-200 mb-1">Quick Join Link</h4>
+                            <p class="text-[11px] text-gray-500 dark:text-gray-400 mb-2">Share this QR code or link to instantly establish a connection.</p>
+                            <button id="copy-share-link-btn" class="px-3 py-1 bg-brand-600 hover:bg-brand-700 text-white rounded-md text-xs font-medium transition flex items-center gap-1.5 mx-auto sm:mx-0">
+                                <i class="fa-solid fa-share-nodes"></i> Copy Invite Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="relative flex py-1 items-center">
+                        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                        <span class="flex-shrink mx-2 text-gray-400 text-[10px] uppercase font-bold tracking-wider">OR</span>
+                        <div class="flex-grow border-t border-gray-200 dark:border-gray-700"></div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-medium mb-1">Connect to Remote Peer</label>
+                        <div class="flex gap-2">
+                            <input id="target-peer-id" type="text" placeholder="Paste Remote Peer ID..." class="flex-1 bg-gray-50 dark:bg-gray-700/60 border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-xs font-mono focus:ring-2 focus:ring-brand-500 outline-none" />
+                            <button id="connect-peer-btn" class="px-4 py-2 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium transition">
+                                Connect
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MANUAL SDP SECTION -->
+                <div id="section-manual" class="space-y-4 hidden">
+                    <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
+                        Use raw Session Description Protocol (SDP) signals directly when signaling servers are unavailable or blocked.
+                    </p>
+
+                    <!-- Step 1: Create Offer -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-gray-50 dark:bg-gray-800/50">
+                        <span class="text-[11px] font-bold text-brand-600 dark:text-brand-400 block mb-1">STEP 1: Initiator Creates Offer</span>
+                        <div class="flex gap-2 mb-2">
+                            <button id="manual-create-offer-btn" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-medium transition">
+                                Generate SDP Offer
+                            </button>
+                            <button id="manual-copy-sdp-btn" class="px-3 py-1.5 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 rounded-lg text-xs font-medium transition">
+                                Copy Local SDP
+                            </button>
+                        </div>
+                        <textarea id="manual-local-sdp" readonly rows="3" placeholder="Generated Offer/Answer SDP will appear here..." class="w-full p-2 text-[10px] font-mono bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg resize-none"></textarea>
+                    </div>
+
+                    <!-- Step 2: Accept Remote Signal -->
+                    <div class="border border-gray-200 dark:border-gray-700 rounded-xl p-3 bg-gray-50 dark:bg-gray-800/50">
+                        <span class="text-[11px] font-bold text-brand-600 dark:text-brand-400 block mb-1">STEP 2: Accept Remote Offer / Answer</span>
+                        <textarea id="manual-remote-sdp" rows="3" placeholder="Paste Remote Offer or Answer SDP here..." class="w-full p-2 text-[10px] font-mono bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-700 rounded-lg resize-none focus:ring-1 focus:ring-brand-500 outline-none mb-2"></textarea>
+                        <button id="manual-accept-sdp-btn" class="px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white rounded-lg text-xs font-medium transition w-full">
+                            Accept & Connect SDP Signal
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- GLOBAL APP STATE ---
+        const state = {
+            peer: null,
+            peerId: null,
+            conn: null,
+            mediaCall: null,
+            localStream: null,
+            remoteStream: null,
+            manualPeerConn: null,
+            manualDataChannel: null,
+            isAudioMuted: false,
+            isVideoMuted: false,
+            callTimerInterval: null,
+            callSeconds: 0,
+            
+            // Chunked File Transfer State
+            incomingFile: {
+                name: '',
+                size: 0,
+                type: '',
+                receivedSize: 0,
+                buffers: []
+            }
+        };
+
+        // UI DOM Elements
+        const el = {
+            themeBtn: document.getElementById('theme-toggle-btn'),
+            openPairModalBtn: document.getElementById('open-pair-modal-btn'),
+            closeModalBtn: document.getElementById('close-modal-btn'),
+            pairModal: document.getElementById('pair-modal'),
+            tabAutoBtn: document.getElementById('tab-auto-btn'),
+            tabManualBtn: document.getElementById('tab-manual-btn'),
+            sectionAuto: document.getElementById('section-auto'),
+            sectionManual: document.getElementById('section-manual'),
+            
+            myPeerId: document.getElementById('my-peer-id'),
+            copyMyIdBtn: document.getElementById('copy-my-id-btn'),
+            copyShareLinkBtn: document.getElementById('copy-share-link-btn'),
+            targetPeerId: document.getElementById('target-peer-id'),
+            connectPeerBtn: document.getElementById('connect-peer-btn'),
+            qrcodeContainer: document.getElementById('qrcode'),
+            
+            manualCreateOfferBtn: document.getElementById('manual-create-offer-btn'),
+            manualCopySdpBtn: document.getElementById('manual-copy-sdp-btn'),
+            manualAcceptSdpBtn: document.getElementById('manual-accept-sdp-btn'),
+            manualLocalSdp: document.getElementById('manual-local-sdp'),
+            manualRemoteSdp: document.getElementById('manual-remote-sdp'),
+            
+            globalStatusDot: document.getElementById('global-status-dot'),
+            globalStatusText: document.getElementById('global-status-text'),
+            peerAvatar: document.getElementById('peer-avatar'),
+            peerDisplayName: document.getElementById('peer-display-name'),
+            peerDetailInfo: document.getElementById('peer-detail-info'),
+            peerStatusIndicator: document.getElementById('peer-status-indicator'),
+            
+            messagesContainer: document.getElementById('messages-container'),
+            messageForm: document.getElementById('message-form'),
+            messageInput: document.getElementById('message-input'),
+            sendBtn: document.getElementById('send-btn'),
+            attachmentBtn: document.getElementById('attachment-btn'),
+            fileInput: document.getElementById('file-input'),
+            clearChatBtn: document.getElementById('clear-chat-btn'),
+            
+            fileProgressContainer: document.getElementById('file-progress-container'),
+            fileProgressLabel: document.getElementById('file-progress-label'),
+            fileProgressPercent: document.getElementById('file-progress-percent'),
+            fileProgressBar: document.getElementById('file-progress-bar'),
+            
+            audioCallBtn: document.getElementById('audio-call-btn'),
+            videoCallBtn: document.getElementById('video-call-btn'),
+            callContainer: document.getElementById('call-container'),
+            localVideo: document.getElementById('local-video'),
+            remoteVideo: document.getElementById('remote-video'),
+            callStatusLabel: document.getElementById('call-status-label'),
+            callTimer: document.getElementById('call-timer'),
+            toggleMicBtn: document.getElementById('toggle-mic-btn'),
+            toggleCamBtn: document.getElementById('toggle-cam-btn'),
+            endCallBtn: document.getElementById('end-call-btn')
+        };
+
+        // --- AUDIO NOTIFICATIONS SYNTHESIZER ---
+        const playTone = (freq, type = 'sine', duration = 0.15) => {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = type;
+                osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + duration);
+            } catch (e) {
+                console.log("Audio play blocked by browser policy");
+            }
+        };
+
+        const soundEffects = {
+            messageReceived: () => {
+                playTone(587.33, 'sine', 0.1);
+                setTimeout(() => playTone(880, 'sine', 0.2), 100);
+            },
+            connected: () => {
+                playTone(440, 'triangle', 0.1);
+                setTimeout(() => playTone(659.25, 'triangle', 0.25), 120);
+            },
+            disconnected: () => {
+                playTone(300, 'sawtooth', 0.2);
+            }
+        };
+
+        // --- THEME MANAGEMENT ---
+        function initTheme() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        
+        el.themeBtn.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        });
+
+        // --- PEERJS INITIALIZATION ---
+        function initPeerJS() {
+            // Generate a random clean ID
+            state.peer = new Peer({
+                debug: 1,
+                config: {
+                    iceServers: [
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
+                    ]
+                }
+            });
+
+            state.peer.on('open', (id) => {
+                state.peerId = id;
+                el.myPeerId.value = id;
+                generateQRCode(window.location.origin + window.location.pathname + '#peer=' + id);
+                
+                // Auto connect if hash contains target peer
+                const hashParams = new URLSearchParams(window.location.hash.replace('#', '?'));
+                const targetPeer = hashParams.get('peer');
+                if (targetPeer && targetPeer !== id) {
+                    setTimeout(() => connectToPeer(targetPeer), 800);
+                }
+            });
+
+            state.peer.on('connection', (connection) => {
+                setupDataConnection(connection);
+            });
+
+            state.peer.on('call', (call) => {
+                handleIncomingCall(call);
+            });
+
+            state.peer.on('error', (err) => {
+                console.error("PeerJS Error:", err);
+                showSystemNotification(`Peer Error: ${err.type}`);
+            });
+        }
+
+        // --- QR CODE GENERATION ---
+        function generateQRCode(text) {
+            el.qrcodeContainer.innerHTML = '';
+            new QRCode(el.qrcodeContainer, {
+                text: text,
+                width: 80,
+                height: 80,
+                colorDark : "#4f46e5",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.M
+            });
+        }
+
+        // --- CONNECT TO REMOTE PEER (AUTO) ---
+        function connectToPeer(remoteId) {
+            if (!remoteId || remoteId === state.peerId) return;
+            showSystemNotification(`Connecting to ${remoteId}...`);
+            const connection = state.peer.connect(remoteId, {
+                reliable: true
+            });
+            setupDataConnection(connection);
+        }
+
+        // --- SETUP DATA CHANNEL LISTENERS ---
+        function setupDataConnection(connection) {
+            state.conn = connection;
+
+            connection.on('open', () => {
+                onPeerConnected(connection.peer);
+            });
+
+            connection.on('data', (data) => {
+                handleIncomingData(data);
+            });
+
+            connection.on('close', () => {
+                onPeerDisconnected();
+            });
+
+            connection.on('error', (err) => {
+                console.error("Data Channel Error:", err);
+            });
+        }
+
+        function onPeerConnected(peerIdentifier) {
+            soundEffects.connected();
+            
+            // Update UI status
+            el.globalStatusDot.classList.replace('bg-red-500', 'bg-green-500');
+            el.globalStatusDot.classList.remove('animate-pulse');
+            el.globalStatusText.textContent = "Connected (P2P)";
+            
+            el.peerDisplayName.textContent = `Peer: ${peerIdentifier.substring(0, 10)}...`;
+            el.peerDetailInfo.textContent = "Direct WebRTC DataChannel Active";
+            el.peerAvatar.textContent = peerIdentifier.substring(0, 2).toUpperCase();
+            el.peerStatusIndicator.classList.replace('bg-gray-400', 'bg-green-500');
+
+            // Enable Controls
+            el.sendBtn.disabled = false;
+            el.audioCallBtn.disabled = false;
+            el.videoCallBtn.disabled = false;
+
+            // Close modal
+            el.pairModal.classList.add('hidden');
+            
+            showSystemNotification("Encrypted P2P Session Established!");
+        }
+
+        function onPeerDisconnected() {
+            soundEffects.disconnected();
+            
+            el.globalStatusDot.classList.replace('bg-green-500', 'bg-red-500');
+            el.globalStatusDot.classList.add('animate-pulse');
+            el.globalStatusText.textContent = "Disconnected";
+
+            el.peerDisplayName.textContent = "No Connected Peer";
+            el.peerDetailInfo.textContent = "Pair via auto room ID or manual SDP";
+            el.peerAvatar.textContent = "?";
+            el.peerStatusIndicator.classList.replace('bg-green-500', 'bg-gray-400');
+
+            el.sendBtn.disabled = true;
+            el.audioCallBtn.disabled = true;
+            el.videoCallBtn.disabled = true;
+
+            showSystemNotification("Peer disconnected.");
+            endActiveCall();
+        }
+
+        // --- MANUAL SDP HANDSHAKE LOGIC ---
+        function initManualPeer() {
+            const config = { iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] };
+            state.manualPeerConn = new RTCPeerConnection(config);
+
+            state.manualPeerConn.onicecandidate = (e) => {
+                if (!e.candidate) {
+                    // ICE Gathering completed, current SDP is ready
+                    el.manualLocalSDP.value = JSON.stringify(state.manualPeerConn.localDescription);
+                }
+            };
+
+            state.manualPeerConn.ondatachannel = (e) => {
+                const dc = e.channel;
+                state.manualDataChannel = dc;
+                bindManualDC(dc);
+            };
+        }
+
+        function bindManualDC(dc) {
+            dc.onopen = () => {
+                // Wrapper to map manual connection as active connection
+                state.conn = {
+                    send: (data) => dc.send(typeof data === 'object' ? JSON.stringify(data) : data),
+                    peer: 'ManualPeer'
+                };
+                onPeerConnected('Manual-SDP-Peer');
+            };
+            dc.onmessage = (e) => {
+                try {
+                    const parsed = JSON.parse(e.data);
+                    handleIncomingData(parsed);
+                } catch {
+                    handleIncomingData(e.data);
+                }
+            };
+            dc.onclose = () => onPeerDisconnected();
+        }
+
+        el.manualCreateOfferBtn.addEventListener('click', async () => {
+            initManualPeer();
+            const dc = state.manualPeerConn.createDataChannel("chat");
+            state.manualDataChannel = dc;
+            bindManualDC(dc);
+
+            const offer = await state.manualPeerConn.createOffer();
+            await state.manualPeerConn.setLocalDescription(offer);
+        });
+
+        el.manualAcceptSdpBtn.addEventListener('click', async () => {
+            const rawSdp = el.manualRemoteSdp.value.trim();
+            if (!rawSdp) return;
+
+            const desc = new RTCSessionDescription(JSON.parse(rawSdp));
+            
+            if (!state.manualPeerConn) {
+                initManualPeer();
+            }
+
+            await state.manualPeerConn.setRemoteDescription(desc);
+
+            if (desc.type === 'offer') {
+                const answer = await state.manualPeerConn.createAnswer();
+                await state.manualPeerConn.setLocalDescription(answer);
+                el.manualLocalSdp.value = JSON.stringify(state.manualPeerConn.localDescription);
+            }
+        });
+
+        // --- DATA RECEIVE ROUTER ---
+        function handleIncomingData(data) {
+            if (typeof data === 'string') {
+                try {
+                    data = JSON.parse(data);
+                } catch {
+                    // Plain text string message
+                    data = { type: 'text', payload: data };
+                }
+            }
+
+            switch (data.type) {
+                case 'text':
+                    appendMessage(data.payload, 'remote');
+                    soundEffects.messageReceived();
+                    break;
+                case 'file-meta':
+                    // Prepare incoming file buffer
+                    state.incomingFile = {
+                        name: data.name,
+                        size: data.size,
+                        mime: data.mime,
+                        receivedSize: 0,
+                        buffers: []
+                    };
+                    showFileProgressBar(true, `Receiving: ${data.name}`);
+                    break;
+                case 'file-chunk':
+                    // Accumulate array buffer chunks
+                    state.incomingFile.buffers.push(data.chunk);
+                    state.incomingFile.receivedSize += data.chunk.byteLength || data.chunk.length;
+                    
+                    const pct = Math.floor((state.incomingFile.receivedSize / state.incomingFile.size) * 100);
+                    updateFileProgress(pct);
+
+                    if (state.incomingFile.receivedSize >= state.incomingFile.size) {
+                        finalizeReceivedFile();
+                    }
+                    break;
+            }
+        }
+
+        // --- SEND TEXT MESSAGE ---
+        function sendMessage() {
+            const text = el.messageInput.value.trim();
+            if (!text || !state.conn) return;
+
+            const msgObj = { type: 'text', payload: text };
+            state.conn.send(msgObj);
+
+            appendMessage(text, 'local');
+            el.messageInput.value = '';
+            el.messageInput.style.height = 'auto';
+        }
+
+        // --- RENDER MESSAGES IN UI ---
+        function appendMessage(content, sender = 'local', isFile = false, fileDetails = null) {
+            const isLocal = sender === 'local';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `flex ${isLocal ? 'justify-end' : 'justify-start'} mb-3`;
+
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            let contentHTML = '';
+            if (isFile) {
+                if (fileDetails.mime.startsWith('image/')) {
+                    contentHTML = `
+                        <div class="mb-1 rounded-lg overflow-hidden max-w-xs">
+                            <img src="${fileDetails.url}" class="w-full h-auto object-cover rounded-md" alt="Shared Image"/>
+                        </div>
+                        <a href="${fileDetails.url}" download="${fileDetails.name}" class="text-xs underline flex items-center gap-1 opacity-90 hover:opacity-100">
+                            <i class="fa-solid fa-download"></i> ${fileDetails.name} (${formatBytes(fileDetails.size)})
+                        </a>
+                    `;
+                } else {
+                    contentHTML = `
+                        <div class="flex items-center gap-3 bg-black/10 dark:bg-white/10 p-2.5 rounded-xl">
+                            <i class="fa-solid fa-file-lines text-2xl"></i>
+                            <div class="overflow-hidden text-left">
+                                <p class="font-semibold text-xs truncate max-w-[180px]">${fileDetails.name}</p>
+                                <p class="text-[10px] opacity-75">${formatBytes(fileDetails.size)}</p>
+                            </div>
+                            <a href="${fileDetails.url}" download="${fileDetails.name}" class="ml-auto p-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition">
+                                <i class="fa-solid fa-download"></i>
+                            </a>
+                        </div>
+                    `;
+                }
+            } else {
+                contentHTML = `<p class="text-sm leading-relaxed whitespace-pre-wrap break-words">${escapeHTML(content)}</p>`;
+            }
+
+            msgDiv.innerHTML = `
+                <div class="max-w-[80%] sm:max-w-[70%] rounded-2xl px-4 py-2.5 shadow-sm ${
+                    isLocal 
+                        ? 'bg-brand-600 text-white rounded-br-xs' 
+                        : 'bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100 rounded-bl-xs'
+                }">
+                    ${contentHTML}
+                    <div class="flex items-center justify-end gap-1 mt-1 text-[10px] opacity-70">
+                        <span>${timestamp}</span>
+                        ${isLocal ? '<i class="fa-solid fa-check-double text-[9px]"></i>' : ''}
+                    </div>
+                </div>
+            `;
+
+            el.messagesContainer.appendChild(msgDiv);
+            el.messagesContainer.scrollTop = el.messagesContainer.scrollHeight;
+        }
+
+        function showSystemNotification(text) {
+            const sysDiv = document.createElement('div');
+            sysDiv.className = 'flex justify-center my-2';
+            sysDiv.innerHTML = `
+                <span class="bg-gray-200 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 px-3 py-1 rounded-full text-[11px]">
+                    ${text}
+                </span>
+            `;
+            el.messagesContainer.appendChild(sysDiv);
+            el.messagesContainer.scrollTop = el.messagesContainer.scrollHeight;
+        }
+
+        // --- FILE CHUNKING & TRANSFER ---
+        const CHUNK_SIZE = 16384; // 16KB WebRTC chunk size optimization
+
+        el.attachmentBtn.addEventListener('click', () => el.fileInput.click());
+
+        el.fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file || !state.conn) return;
+
+            sendFile(file);
+            el.fileInput.value = '';
+        });
+
+        async function sendFile(file) {
+            showFileProgressBar(true, `Sending: ${file.name}`);
+
+            // Send metadata
+            state.conn.send({
+                type: 'file-meta',
+                name: file.name,
+                size: file.size,
+                mime: file.type
+            });
+
+            const reader = new FileReader();
+            let offset = 0;
+
+            reader.onload = (e) => {
+                if (!state.conn) return;
+
+                state.conn.send({
+                    type: 'file-chunk',
+                    chunk: e.target.result
+                });
+
+                offset += e.target.result.byteLength;
+                const progress = Math.floor((offset / file.size) * 100);
+                updateFileProgress(progress);
+
+                if (offset < file.size) {
+                    readNextChunk();
+                } else {
+                    // Send completed
+                    showFileProgressBar(false);
+                    const fileUrl = URL.createObjectURL(file);
+                    appendMessage('', 'local', true, {
+                        name: file.name,
+                        size: file.size,
+                        mime: file.type,
+                        url: fileUrl
+                    });
+                }
+            };
+
+            function readNextChunk() {
+                const slice = file.slice(offset, offset + CHUNK_SIZE);
+                reader.readAsArrayBuffer(slice);
+            }
+
+            readNextChunk();
+        }
+
+        function finalizeReceivedFile() {
+            showFileProgressBar(false);
+            const blob = new Blob(state.incomingFile.buffers, { type: state.incomingFile.mime });
+            const fileUrl = URL.createObjectURL(blob);
+
+            appendMessage('', 'remote', true, {
+                name: state.incomingFile.name,
+                size: state.incomingFile.size,
+                mime: state.incomingFile.mime,
+                url: fileUrl
+            });
+
+            soundEffects.messageReceived();
+        }
+
+        function showFileProgressBar(show, label = '') {
+            if (show) {
+                el.fileProgressContainer.classList.remove('hidden');
+                el.fileProgressLabel.textContent = label;
+                updateFileProgress(0);
+            } else {
+                el.fileProgressContainer.classList.add('hidden');
+            }
+        }
+
+        function updateFileProgress(pct) {
+            el.fileProgressPercent.textContent = `${pct}%`;
+            el.fileProgressBar.style.width = `${pct}%`;
+        }
+
+        // --- WEBRTC AUDIO / VIDEO CALLS ---
+        async function startCall(videoEnabled = true) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: videoEnabled
+                });
+
+                state.localStream = stream;
+                el.localVideo.srcObject = stream;
+                el.callContainer.classList.remove('hidden');
+
+                if (state.peer && state.conn) {
+                    const call = state.peer.call(state.conn.peer, stream);
+                    setupCallListeners(call);
+                }
+                
+                startCallTimer();
+            } catch (err) {
+                console.error("Camera/Mic Permission Error:", err);
+                showSystemNotification("Could not access camera/microphone.");
+            }
+        }
+
+        function handleIncomingCall(call) {
+            if (confirm(`Incoming ${call.metadata?.type || 'media'} call from peer. Accept?`)) {
+                navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then((stream) => {
+                    state.localStream = stream;
+                    el.localVideo.srcObject = stream;
+                    el.callContainer.classList.remove('hidden');
+                    
+                    call.answer(stream);
+                    setupCallListeners(call);
+                    startCallTimer();
+                }).catch(() => {
+                    showSystemNotification("Call rejected: Media permissions denied.");
+                });
+            }
+        }
+
+        function setupCallListeners(call) {
+            state.mediaCall = call;
+
+            call.on('stream', (remoteStream) => {
+                state.remoteStream = remoteStream;
+                el.remoteVideo.srcObject = remoteStream;
+            });
+
+            call.on('close', () => {
+                endActiveCall();
+            });
+        }
+
+        function endActiveCall() {
+            if (state.mediaCall) state.mediaCall.close();
+            if (state.localStream) {
+                state.localStream.getTracks().forEach(track => track.stop());
+            }
+            el.callContainer.classList.add('hidden');
+            clearInterval(state.callTimerInterval);
+            state.callSeconds = 0;
+            el.callTimer.textContent = '00:00';
+        }
+
+        function startCallTimer() {
+            state.callSeconds = 0;
+            clearInterval(state.callTimerInterval);
+            state.callTimerInterval = setInterval(() => {
+                state.callSeconds++;
+                const mins = String(Math.floor(state.callSeconds / 60)).padStart(2, '0');
+                const secs = String(state.callSeconds % 60).padStart(2, '0');
+                el.callTimer.textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        // Call Control Buttons
+        el.audioCallBtn.addEventListener('click', () => startCall(false));
+        el.videoCallBtn.addEventListener('click', () => startCall(true));
+        el.endCallBtn.addEventListener('click', () => endActiveCall());
+
+        el.toggleMicBtn.addEventListener('click', () => {
+            if (state.localStream) {
+                const audioTrack = state.localStream.getAudioTracks()[0];
+                if (audioTrack) {
+                    audioTrack.enabled = !audioTrack.enabled;
+                    el.toggleMicBtn.classList.toggle('bg-red-600', !audioTrack.enabled);
+                }
+            }
+        });
+
+        el.toggleCamBtn.addEventListener('click', () => {
+            if (state.localStream) {
+                const videoTrack = state.localStream.getVideoTracks()[0];
+                if (videoTrack) {
+                    videoTrack.enabled = !videoTrack.enabled;
+                    el.toggleCamBtn.classList.toggle('bg-red-600', !videoTrack.enabled);
+                }
+            }
+        });
+
+        // --- UI & EVENT LISTENERS ---
+        
+        // Modal Handlers
+        el.openPairModalBtn.addEventListener('click', () => el.pairModal.classList.remove('hidden'));
+        el.closeModalBtn.addEventListener('click', () => el.pairModal.classList.add('hidden'));
+
+        // Tab Switching
+        el.tabAutoBtn.addEventListener('click', () => {
+            el.tabAutoBtn.className = "flex-1 py-2 rounded-lg text-center bg-white dark:bg-gray-800 shadow-sm text-brand-600 dark:text-brand-400 transition";
+            el.tabManualBtn.className = "flex-1 py-2 rounded-lg text-center text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition";
+            el.sectionAuto.classList.remove('hidden');
+            el.sectionManual.classList.add('hidden');
+        });
+
+        el.tabManualBtn.addEventListener('click', () => {
+            el.tabManualBtn.className = "flex-1 py-2 rounded-lg text-center bg-white dark:bg-gray-800 shadow-sm text-brand-600 dark:text-brand-400 transition";
+            el.tabAutoBtn.className = "flex-1 py-2 rounded-lg text-center text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition";
+            el.sectionManual.classList.remove('hidden');
+            el.sectionAuto.classList.add('hidden');
+        });
+
+        // Copy Handlers
+        el.copyMyIdBtn.addEventListener('click', () => copyToClipboard(el.myPeerId.value));
+        el.copyShareLinkBtn.addEventListener('click', () => {
+            const url = window.location.origin + window.location.pathname + '#peer=' + state.peerId;
+            copyToClipboard(url);
+        });
+        el.manualCopySdpBtn.addEventListener('click', () => copyToClipboard(el.manualLocalSdp.value));
+
+        // Connect Auto Button
+        el.connectPeerBtn.addEventListener('click', () => {
+            const target = el.targetPeerId.value.trim();
+            if (target) connectToPeer(target);
+        });
+
+        // Chat Submission
+        el.messageForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sendMessage();
+        });
+
+        el.messageInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto resize message input
+        el.messageInput.addEventListener('input', () => {
+            el.messageInput.style.height = 'auto';
+            el.messageInput.style.height = Math.min(el.messageInput.scrollHeight, 128) + 'px';
+        });
+
+        el.clearChatBtn.addEventListener('click', () => {
+            el.messagesContainer.innerHTML = '';
+            showSystemNotification("Chat history cleared.");
+        });
+
+        // Utility Helpers
+        function copyToClipboard(text) {
+            if (!text) return;
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showSystemNotification("Copied to clipboard!");
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+
+        function formatBytes(bytes, decimals = 2) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        // --- APP LAUNCH ---
+        window.onload = () => {
+            initTheme();
+            initPeerJS();
+        };
+    </script>
+</body>
+</html>

@@ -36,7 +36,7 @@
             <li class="list-group-item"><a accesskey="n" class="btn btn-warning"  href="db.html">Database Tools</a></li>
             <li class="list-group-item"><a accesskey="n" class="btn btn-success"  href="index.html">Refresh</a>
 
-<a accesskey="n" class="btn btn-info" style="margin-left:10px;" href="calc.html">Calculate</a>
+<a accesskey="n" class="btn btn-info" style="margin-left:10px;" href="dayscalculator.html">Calculate</a>
 
 </li>
             
@@ -102,7 +102,7 @@
     <td>${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")}</td>
     <td>${val[index]["money"]}</td>
     <td>
-      <a style="cursor:pointer" onclick="copytext('${val[index]["name"]} ${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")}')">📋</a>
+      <a style="cursor:pointer" onclick="copytext('${moment(val[index]["date"], "YYYY/MM/DD").format("DD/MM/YY")} ${val[index]["name"]}')">📋</a>
     </td>
     <td>
       <button onclick="deleteEntry(${val[index]["ID"]}, '${encodeURIComponent(val[index]["name"])}')" class="btn btn-sm btn-danger">🚫</button>
